@@ -1,6 +1,6 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
-from datetime import datetime, timezone, timedelta
 
 st.set_page_config(
     page_title="Holiday 2027",
@@ -13,65 +13,116 @@ st.title("☀️ Holiday Hub")
 st.caption("9 Travellers | Khao Lak & Surfers Paradise")
 
 # ---------------------------------------------------------
-# FLIGHT COUNTDOWNS
+# LIVE TICKING JAVASCRIPT COUNTDOWN
 # ---------------------------------------------------------
-st.subheader("🛫 Flight Countdowns")
+st.subheader("🛫 Live Flight Countdowns")
 
-now_utc = datetime.now(timezone.utc)
+countdown_html = """
+<style>
+  .countdown - grid {
+    display: grid;
+    grid - template - columns: repeat(auto - fit, minmax(240px, 1fr));
+    gap: 16px;
+    font - family: - apple - system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans - serif;
+  }
+  .card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border - radius: 10px;
+    padding: 16px;
+    box - shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .title {
+    font - size: 14px;
+    font - weight: 600;
+    color: #475569;
+    margin - bottom: 6px;
+  }
+  .timer {
+    font - size: 26px;
+    font - weight: 700;
+    color: #0f172a;
+    letter - spacing: - 0.5px;
+    margin - bottom: 12px;
+  }
+  .detail {
+    font - size: 13px;
+    color: #334155;
+    margin: 3px 0;
+  }
+  .ref {
+    font - size: 12px;
+    color: #94a3b8;
+    margin - top: 8px;
+  }
+</style>
 
-flights = [
-    {
-        "name": "1. Heathrow to Phuket",
-        "flight": "Virgin Atlantic VS214",
-        "ref": "D48RHT",
-        "route": "LHR -> HKT",
-        "depart_local": "17 Mar 2027, 16:10 GMT",
-        "depart_dt": datetime(2027, 3, 17, 16, 10, tzinfo=timezone.utc)
-    },
-    {
-        "name": "2. Phuket to Singapore",
-        "flight": "Singapore Airlines SQ739",
-        "ref": "5OBEZB",
-        "route": "HKT -> SIN",
-        "depart_local": "25 Mar 2027, 20:25 ICT",
-        "depart_dt": datetime(2027, 3, 25, 20, 25, tzinfo=timezone(timedelta(hours=7)))
-    },
-    {
-        "name": "3. Singapore to Brisbane",
-        "flight": "Singapore Airlines SQ255",
-        "ref": "5OBEZB",
-        "route": "SIN -> BNE",
-        "depart_local": "26 Mar 2027, 00:55 SGT",
-        "depart_dt": datetime(2027, 3, 26, 0, 55, tzinfo=timezone(timedelta(hours=8)))
-    }
-]
+<div class="countdown - grid">
+  <div class="card">
+    <div class="title">1. Heathrow to Phuket</div>
+    <div class="timer" id="timer - lhr">Loading...</div>
+    <div class="detail"><strong>Route:</strong> LHR &rarr; HKT</div>
+    <div class="detail"><strong>Flight:</strong> Virgin Atlantic VS214</div>
+    <div class="detail"><strong>Departure:</strong> 17 Mar 2027, 16:10 GMT</div>
+    <div class="ref">Ref: D48RHT</div>
+  </div>
 
-cols = st.columns(3)
+  <div class="card">
+    <div class="title">2. Phuket to Singapore</div>
+    <div class="timer" id="timer - sin">Loading...</div>
+    <div class="detail"><strong>Route:</strong> HKT &rarr; SIN</div>
+    <div class="detail"><strong>Flight:</strong> Singapore Airlines SQ739</div>
+    <div class="detail"><strong>Departure:</strong> 25 Mar 2027, 20:25 ICT</div>
+    <div class="ref">Ref: 5OBEZB</div>
+  </div>
 
-for idx, flight in enumerate(flights):
-    with cols[idx]:
-        diff = flight["depart_dt"] - now_utc
-        if diff.total_seconds() > 0:
-            days = diff.days
-            hours = diff.seconds // 3600
-            mins = (diff.seconds % 3600) // 60
-            countdown_str = f"{days}d {hours}h {mins}m"
-        else:
-            countdown_str = "Departed"
+  <div class="card">
+    <div class="title">3. Singapore to Brisbane</div>
+    <div class="timer" id="timer - bne">Loading...</div>
+    <div class="detail"><strong>Route:</strong> SIN &rarr; BNE</div>
+    <div class="detail"><strong>Flight:</strong> Singapore Airlines SQ255</div>
+    <div class="detail"><strong>Departure:</strong> 26 Mar 2027, 00:55 SGT</div>
+    <div class="ref">Ref: 5OBEZB</div>
+  </div>
+</div>
 
-        with st.container(border=True):
-            st.metric(label=flight["name"], value=countdown_str)
-            st.markdown(f"**Route:** {flight['route']}")
-            st.markdown(f"**Flight:** {flight['flight']}")
-            st.markdown(f"**Departure:** {flight['depart_local']}")
-            st.caption(f"Ref: {flight['ref']}")
+<script>
+  const flights = [
+    { id: "timer - lhr", date: new Date("2027 - 03 - 17T16:10:00Z").getTime() },
+    { id: "timer - sin", date: new Date("2027 - 03 - 25T20:25:00+07:00").getTime() },
+    { id: "timer - bne", date: new Date("2027 - 03 - 26T00:55:00+08:00").getTime() }
+  ];
+
+  function updateCountdowns() {
+    const now = new Date().getTime();
+    flights.forEach(f => {
+      const distance = f.date - now;
+      const el = document.getElementById(f.id);
+      if (distance < 0) {
+        el.innerHTML = "Departed";
+      } else {
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        el.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+    });
+  }
+
+  updateCountdowns();
+  setInterval(updateCountdowns, 1000);
+</script>
+"""
+
+# Render the countdown widget
+components.html(countdown_html, height=230)
 
 st.divider()
 
 # ---------------------------------------------------------
 # TABS SECTION
 # ---------------------------------------------------------
-# Exchange rate reference values
 THB_TO_GBP = 0.022
 AUD_TO_GBP = 0.52
 
