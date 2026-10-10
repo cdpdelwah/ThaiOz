@@ -13,7 +13,7 @@ st.title("☀️ Holiday Hub")
 st.caption("9 Travellers | Khao Lak & Surfers Paradise")
 
 # ---------------------------------------------------------
-# FLIGHT COUNTDOWNS (NATIVE STREAMLIT)
+# FLIGHT COUNTDOWNS (NATIVE STREAMLIT TICKING LIVE)
 # ---------------------------------------------------------
 st.subheader("🛫 Flight Countdowns")
 
@@ -30,7 +30,7 @@ flights = [
         "name": "2. Phuket to Singapore",
         "flight": "Singapore Airlines SQ739",
         "ref": "5OBEZB",
-        "route": "HKT to SIN",
+        "route": "HKT to Singapore",
         "depart_local": "25 Mar 2027, 20:25 ICT",
         "depart_dt": datetime(2027, 3, 25, 20, 25, tzinfo=timezone(timedelta(hours=7)))
     },
@@ -38,14 +38,14 @@ flights = [
         "name": "3. Singapore to Brisbane",
         "flight": "Singapore Airlines SQ255",
         "ref": "5OBEZB",
-        "route": "SIN to BNE",
+        "route": "Singapore to Brisbane",
         "depart_local": "26 Mar 2027, 00:55 SGT",
         "depart_dt": datetime(2027, 3, 26, 0, 55, tzinfo=timezone(timedelta(hours=8)))
     }
 ]
 
-# Auto updates in place every 60 seconds
-@st.fragment(run_every="60s")
+# Runs every single second to tick down live
+@st.fragment(run_every="1s")
 def render_flight_cards():
     now_utc = datetime.now(timezone.utc)
     cols = st.columns(3)
@@ -53,11 +53,14 @@ def render_flight_cards():
     for idx, flight in enumerate(flights):
         with cols[idx]:
             diff = flight["depart_dt"] - now_utc
-            if diff.total_seconds() > 0:
-                days = diff.days
-                hours = diff.seconds // 3600
-                mins = (diff.seconds % 3600) // 60
-                countdown_str = f"{days}d {hours}h {mins}m"
+            total_seconds = int(diff.total_seconds())
+            
+            if total_seconds > 0:
+                days = total_seconds // 86400
+                hours = (total_seconds % 86400) // 3600
+                mins = (total_seconds % 3600) // 60
+                secs = total_seconds % 60
+                countdown_str = f"{days}d {hours}h {mins}m {secs}s"
             else:
                 countdown_str = "Departed"
 
