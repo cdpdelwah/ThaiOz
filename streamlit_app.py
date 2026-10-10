@@ -12,6 +12,9 @@ st.set_page_config(
 st.title("☀️ Holiday Hub")
 st.caption("9 Travellers | Khao Lak & Surfers Paradise")
 
+# The 9 Travellers
+GROUP = ["Andy", "Meg", "Hannah", "Jo", "Laila", "Molly", "Ethan", "Robyn", "Amber"]
+
 # ---------------------------------------------------------
 # FLIGHT COUNTDOWNS (NATIVE STREAMLIT TICKING LIVE)
 # ---------------------------------------------------------
@@ -52,7 +55,6 @@ flights = [
     }
 ]
 
-# Runs every second to tick down live
 @st.fragment(run_every="1s")
 def render_flight_cards():
     now_utc = datetime.now(timezone.utc)
@@ -89,13 +91,16 @@ st.divider()
 THB_TO_GBP = 0.022
 AUD_TO_GBP = 0.52
 
-tab_itinerary, tab_expenses, tab_stays, tab_activities = st.tabs([
+tab_itinerary, tab_expenses, tab_stays, tab_activities, tab_vax, tab_avatars = st.tabs([
     "📅 Itinerary",
     "💰 Expenses",
     "📍 Stays & Travel",
-    "🙋 Activities"
+    "🙋 Activities",
+    "💉 Vaccinations",
+    "🎭 Avatars"
 ])
 
+# TAB 1: ITINERARY
 with tab_itinerary:
     st.subheader("Trip Timeline")
     timeline_data = [
@@ -109,13 +114,14 @@ with tab_itinerary:
     ]
     st.dataframe(pd.DataFrame(timeline_data), use_container_width=True, hide_index=True)
 
+# TAB 2: EXPENSES
 with tab_expenses:
     st.subheader("Quick Expense Converter & Logger")
     with st.form("spend_form", clear_on_submit=True):
         col_a, col_b = st.columns(2)
         with col_a:
-            payer = st.selectbox("Paid by", ["Andy", "Meghann", "Other"])
-            item = st.text_input("Item", placeholder="e.g. Minibus transfer, grocery run")
+            payer = st.selectbox("Paid by", GROUP)
+            item = st.text_input("Item", placeholder="e.g. Minibus transfer, dinner tab")
         with col_b:
             curr = st.selectbox("Currency", ["THB", "AUD", "GBP"])
             val = st.number_input("Amount", min_value=0.0, step=1.0)
@@ -125,18 +131,76 @@ with tab_expenses:
             conv = val * THB_TO_GBP if curr == "THB" else (val * AUD_TO_GBP if curr == "AUD" else val)
             st.success(f"Recorded {val:,.2f} {curr} (~£{conv:,.2f} GBP) paid by {payer} for {item}")
 
+# TAB 3: STAYS & TRAVEL
 with tab_stays:
     st.subheader("Addresses & Access Info")
     with st.expander("🏨 The Sands Khao Lak (18 - 25 March)", expanded=True):
         st.markdown("**English:** 10/185 Moo 7, Khuk Khak, Takuapa, Phang Nga 82220")
         st.markdown("**Thai Driver Card:** เดอะแซนด์ เขาหลัก บาย กะตะธานี 10/185 หมู่ 7 ต.คึกคัก อ.ตะกั่วป่า จ.พังงา")
         st.info("Airport transfer: 75 to 90 minutes north from Phuket Airport (HKT).")
-    with st.expander("🏄 Surfers Paradise"):
+    with st.expander("🏄 Surfers Paradise Base"):
         st.markdown("**Location:** Gold Coast, Queensland")
         st.markdown("**Transfer:** 85 km south from Brisbane Airport via M1 motorway.")
 
+# TAB 4: ACTIVITIES
 with tab_activities:
     st.subheader("Excursion Headcounts")
     outing = st.selectbox("Outing", ["Currumbin Sanctuary", "Theme Parks", "Burleigh Heads Lunch", "Broadwater Boat Hire"])
-    people = st.multiselect("Who is going?", ["Andy", "Meghann", "Robyn", "Adult 4", "Adult 5", "Adult 6", "Adult 7", "Child 2", "Child 3"], default=["Andy"])
+    people = st.multiselect("Who is going?", GROUP, default=["Andy"])
     st.metric(label=f"Total head count for {outing}", value=f"{len(people)} of 9")
+
+# TAB 5: VACCINATIONS
+with tab_vax:
+    st.subheader("Travel Health & Vaccination Checklist")
+    st.caption("UK NHS / Fitfortravel general advice. Check with your GP or travel clinic 6 to 8 weeks prior to departure.")
+
+    col_thai, col_aus = st.columns(2)
+    with col_thai:
+        with st.container(border=True):
+            st.markdown("### 🇹🇭 Thailand (Khao Lak)")
+            st.markdown("**Standard recommended for most travellers:**")
+            st.markdown("- **Hepatitis A** (food and water borne)")
+            st.markdown("- **Tetanus** (check booster is up to date)")
+            st.markdown("- **Typhoid** (usually recommended for rural dining or extended stays)")
+            st.divider()
+            st.markdown("**Consider for some travellers:**")
+            st.markdown("- **Hepatitis B**")
+            st.markdown("- **Rabies** (avoid feeding stray beach dogs or monkeys)")
+            st.markdown("- **Dengue / Mosquito precautions:** Khao Lak has low malaria risk, but high strength DEET insect repellent is essential for dengue.")
+
+    with col_aus:
+        with st.container(border=True):
+            st.markdown("### 🇦🇺 Australia (Queensland)")
+            st.markdown("**Standard routine UK boosters:**")
+            st.markdown("- **MMR** (Measles, Mumps, Rubella)")
+            st.markdown("- **Tetanus, Diphtheria & Polio**")
+            st.divider()
+            st.markdown("**Health reminders:**")
+            st.markdown("- **No specific exotic travel vaccines required.**")
+            st.markdown("- **Sun Protection:** Queensland UV index is severe. Pack SPF 50+ broad spectrum sunscreen, hats and rash vests.")
+            st.markdown("- **Reciprocal Healthcare:** UK citizens are eligible for essential treatment via Medicare under the reciprocal healthcare agreement, but comprehensive travel insurance remains essential.")
+
+# TAB 6: AVATARS
+with tab_avatars:
+    st.subheader("The Holiday Crew")
+    st.caption("9 Travellers ready for Thailand & Australia")
+
+    crew = [
+        {"name": "Andy", "icon": "👑", "role": "Trip Commissioner", "vibe": "Spreadsheets, transfers and morning coffee runs"},
+        {"name": "Meg", "icon": "🌸", "role": "Chief Coordinator", "vibe": "Keeping the peace and spotting beach sunset spots"},
+        {"name": "Hannah", "icon": "✨", "role": "Sunshine Seeker", "vibe": "First by the pool, last to leave the beach"},
+        {"name": "Jo", "icon": "🌴", "role": "Relaxation Specialist", "vibe": "Chilled poolside drinks and finding great food"},
+        {"name": "Laila", "icon": "🌊", "role": "Wave Watcher", "vibe": "Exploring the shorelines and coastal walks"},
+        {"name": "Molly", "icon": "☀️", "role": "Holiday Adventurer", "vibe": "Up for boat trips, markets and day tours"},
+        {"name": "Ethan", "icon": "🏄‍♂️", "role": "Coast Cruiser", "vibe": "Ready for theme park rides and ocean swims"},
+        {"name": "Robyn", "icon": "🍧", "role": "Chief Fun Officer", "vibe": "Ice cream tracker and water slide explorer"},
+        {"name": "Amber", "icon": "🐬", "role": "Wildlife Scout", "vibe": "Spotting dolphins, kangaroos and koalas"}
+    ]
+
+    cols_av = st.columns(3)
+    for i, member in enumerate(crew):
+        with cols_av[i % 3]:
+            with st.container(border=True):
+                st.markdown(f"## {member['icon']} {member['name']}")
+                st.markdown(f"**Role:** {member['role']}")
+                st.caption(member["vibe"])
