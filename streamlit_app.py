@@ -41,14 +41,22 @@ flights = [
         "route": "Singapore to Brisbane",
         "depart_local": "26 Mar 2027, 00:55 SGT",
         "depart_dt": datetime(2027, 3, 26, 0, 55, tzinfo=timezone(timedelta(hours=8)))
+    },
+    {
+        "name": "4. Brisbane to Heathrow (TBD)",
+        "flight": "TBD",
+        "ref": "TBD",
+        "route": "BNE to LHR",
+        "depart_local": "07 Apr 2027, 12:00 AEST (TBD)",
+        "depart_dt": datetime(2027, 4, 7, 12, 0, tzinfo=timezone(timedelta(hours=10)))
     }
 ]
 
-# Runs every single second to tick down live
+# Runs every second to tick down live
 @st.fragment(run_every="1s")
 def render_flight_cards():
     now_utc = datetime.now(timezone.utc)
-    cols = st.columns(3)
+    cols = st.columns(4)
     
     for idx, flight in enumerate(flights):
         with cols[idx]:
@@ -97,7 +105,7 @@ with tab_itinerary:
         {"Date": "25 Mar", "Stage": "SQ739 departs Phuket 20:25, lands Singapore 23:35"},
         {"Date": "26 Mar", "Stage": "SQ255 departs Singapore 00:55, lands Brisbane 10:45, transfer to Surfers Paradise"},
         {"Date": "27 Mar - 6 Apr", "Stage": "Gold Coast stay, family visits and day trips"},
-        {"Date": "07 Apr", "Stage": "Fly Brisbane back to London Heathrow"}
+        {"Date": "07 Apr", "Stage": "Fly Brisbane back to London Heathrow (TBD ~12:00)"}
     ]
     st.dataframe(pd.DataFrame(timeline_data), use_container_width=True, hide_index=True)
 
