@@ -106,7 +106,7 @@ with tab_adventurers:
     st.caption("9 Travellers ready for Thailand & Australia")
 
     crew = [
-        {"name": "Andy", "icon": "👑", "role": "Trip Commissioner", "vibe": "Spreadsheets, transfers and morning coffee runs"},
+        {"name": "Andy", "icon": "🤡", "role": "Trip Commissioner", "vibe": "Spreadsheets, transfers and morning coffee runs"},
         {"name": "Meg", "icon": "🌸", "role": "Chief Coordinator", "vibe": "Keeping the peace and spotting beach sunset spots"},
         {"name": "Hannah", "icon": "✨", "role": "Sunshine Seeker", "vibe": "First by the pool, last to leave the beach"},
         {"name": "Jo", "icon": "🌴", "role": "Relaxation Specialist", "vibe": "Chilled poolside drinks and finding great food"},
